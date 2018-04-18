@@ -12,7 +12,7 @@
 FILA2 readyQueue;
 FILA2 blockQueue;
 FILA2 suspendReadyQueue;
-FILA2 suspendeblockQueue;
+FILA2 suspendBlockQueue;
 FILA2 blockedsByAnotherThread;
 
 TCB_t *runningThread = NULL;
@@ -22,10 +22,10 @@ int systemInitialized = false;
 
 int initQueues();
 int createMainThread();
-int createfinalizationContext();
-int initializesystem();
+int createFinalizationContext();
+int initializeSystem();
 int initializeContext(ucontext_t *context, void* (*start)(void*), int argSize, void *arg);
-int dispatcher();	
+int dispatcher();
 int generateTID();
 void threadFinalizator();
 void printQueue(FILA2 fila);
@@ -39,7 +39,7 @@ void* func0(void *arg) {
 	// printf("cyield func0()\n" );
 	printf("vai suspender main\n");
 	// csuspend(2);
-	csuspend(0);	
+	csuspend(0);
 	return 0;
 }
 
@@ -52,6 +52,7 @@ void* func1(void *arg) {
 	cresume(0);
 	return 0;
 }
+
 void* func2(void *arg) {
 	printf("Eu sou a thread ID3 imprimindo %d\n", *((int *)arg));
 	printf("foo2 passando a vez seria pra main, mas deve ir pra foo1\n");
@@ -74,96 +75,100 @@ int main(int argc, char *argv[]) {
 
 
 	cjoin(id0);
-	
+
 
 	printf("Eu sou a main voltando para terminar o programa\n");
 	return 0;
 }
 
 
-int initQueues(){
-	
-	if(CreateFila2(&readyQueue) < 0){
+int initQueues() {
+	if(CreateFila2(&readyQueue) < 0) {
 		return -1;
 	}
 
-	if(CreateFila2(&blockQueue) < 0){
+	if(CreateFila2(&blockQueue) < 0) {
 		return -1;
 	}
 
-	if(CreateFila2(&suspendReadyQueue) < 0){
+	if(CreateFila2(&suspendReadyQueue) < 0) {
 		return -1;
 	}
 
-	if(CreateFila2(&suspendeblockQueue) < 0){
+	if(CreateFila2(&suspendBlockQueue) < 0) {
 		return -1;
 	}
-	if(CreateFila2(&blockedsByAnotherThread) < 0){
+	if(CreateFila2(&blockedsByAnotherThread) < 0) {
 		return -1;
 	}
 	return 0;
 }
 
-int createMainThread(){
+int createMainThread() {
 	TCB_t *mainThread = (TCB_t *) malloc(sizeof(TCB_t));
-	if(mainThread == NULL){
+	if(mainThread == NULL) {
 		return -1;
 	}
 
-	getcontext(&(mainThread->context)); 
+	getcontext(&(mainThread->context));
 	mainThread->tid = generateTID();
 	mainThread->state = PROCST_EXEC;
 	mainThread->prio = 0;
 	runningThread = mainThread;
-	
+
 	return 0;
 }
-int createfinalizationContext(){
+
+int createFinalizationContext() {
 	finalizationContext = (ucontext_t *) malloc(sizeof(ucontext_t));
-	if(finalizationContext == NULL){
+	if(finalizationContext == NULL) {
 		return -1;
 	}
 	getcontext(finalizationContext);
 	finalizationContext->uc_link = NULL;
-    finalizationContext->uc_stack.ss_sp = (char *) malloc(SIGSTKSZ);
-    finalizationContext->uc_stack.ss_size = SIGSTKSZ;
-	
+  finalizationContext->uc_stack.ss_sp = (char *) malloc(SIGSTKSZ);
+  finalizationContext->uc_stack.ss_size = SIGSTKSZ;
+
 	makecontext(finalizationContext, threadFinalizator, 0);
 	return 0;
 }
-int initializesystem(){
 
+int initializeSystem() {
 	if(initQueues() < 0) return -1;
-	if(createfinalizationContext() < 0) return -1;
+	if(createFinalizationContext() < 0) return -1;
 	if(createMainThread() < 0) return -1;
 	systemInitialized = true;
 	return 0;
 }
-int generateTID(){
-	int id= nextId;
+
+int generateTID() {
+	int id = nextId;
 	nextId++;
 	return id;
 }
-void threadFinalizator(){
+
+void threadFinalizator() {
 	printf("FINALIZADOR DE THREAD DELETANDO %d\n", runningThread->tid );
 	int blockedThreadTid = anyThreadBlockedForThis(runningThread->tid);
 	if(blockedThreadTid != -1) {
-		if(unblockThread(blockedThreadTid) != 0){
+		if(unblockThread(blockedThreadTid) != 0) {
 			printf("ruiiiiiiiiiiiiiiiiiiiiiim\n");
 		}
 	}
 	free(runningThread->context.uc_stack.ss_sp);
 	free(runningThread);
-	
+
 	dispatcher();
 }
-int unblockThread(int blockedThreadTid){
+
+int unblockThread(int blockedThreadTid) {
 	TCB_t *aux;
 	int unblockThread = false;
-	
+
 	FirstFila2(&blockQueue);
-	while((aux = GetAtIteratorFila2(&blockQueue)) && aux!= NULL && unblockThread == false){
-		if(aux->tid == blockedThreadTid){
+	while((aux = GetAtIteratorFila2(&blockQueue))
+			&& aux != NULL && unblockThread == false) {
+		if(aux->tid == blockedThreadTid) {
 			aux->state = PROCST_APTO;
 			AppendFila2(&readyQueue, (void *) aux);
 			DeleteAtIteratorFila2(&blockQueue);
@@ -172,29 +177,32 @@ int unblockThread(int blockedThreadTid){
 		NextFila2(&blockQueue);
 	}
 
-	FirstFila2(&suspendeblockQueue);
-	while((aux = GetAtIteratorFila2(&suspendeblockQueue)) && aux!= NULL && unblockThread == false){
-		if(aux->tid == blockedThreadTid){
+	FirstFila2(&suspendBlockQueue);
+	while((aux = GetAtIteratorFila2(&suspendBlockQueue))
+		  && aux != NULL && unblockThread == false) {
+		if(aux->tid == blockedThreadTid) {
 			aux->state = PROCST_APTO_SUS;
 			AppendFila2(&suspendReadyQueue, (void *) aux);
-			DeleteAtIteratorFila2(&suspendeblockQueue);
+			DeleteAtIteratorFila2(&suspendBlockQueue);
 			unblockThread = true;
 		}
-		NextFila2(&suspendeblockQueue);
+		NextFila2(&suspendBlockQueue);
 	}
 
 	// if (changeQueueOfThread(blockQueue,readyQueue,blockedThreadTid) != 0){             // I couldn't understand why this isn't working, it appers to change the pointer when passing the parameter to another function
-	// 	if(changeQueueOfThread(suspendeblockQueue, suspendReadyQueue, blockedThreadTid) != 0){
+	// 	if(changeQueueOfThread(suspendBlockQueue, suspendReadyQueue, blockedThreadTid) != 0){
 	// 		return -1;
 	// 	}
 	// }
 	return !unblockThread	;
 }
-void printQueue(FILA2 fila){
+
+void printQueue(FILA2 fila) {
 	FirstFila2(&fila);
 	TCB_t *aux;
 	printf("threads on readyQueue: ");
-	while((aux = GetAtIteratorFila2(&fila)) && aux!= NULL){
+
+	while((aux = GetAtIteratorFila2(&fila)) && aux != NULL) {
 		aux = GetAtIteratorFila2(&fila);
 		printf("\t%d",aux->tid);
 		NextFila2(&fila);
@@ -203,11 +211,12 @@ void printQueue(FILA2 fila){
 }
 
 
-int anyThreadBlockedForThis(int blockerThreadTid){
+int anyThreadBlockedForThis(int blockerThreadTid) {
 	BlockedThreadPair *aux;
 	FirstFila2(&blockedsByAnotherThread);
-	while((aux = GetAtIteratorFila2(&blockedsByAnotherThread)) && aux!= NULL){
-		if(aux->blockerThreadTid == blockerThreadTid){
+
+	while((aux = GetAtIteratorFila2(&blockedsByAnotherThread)) && aux != NULL) {
+		if(aux->blockerThreadTid == blockerThreadTid) {
 			return aux->blockedThreadTid;
 		}
 		NextFila2(&blockedsByAnotherThread);
@@ -233,135 +242,145 @@ int anyThreadBlockedForThis(int blockerThreadTid){
 // 	}
 // 	return -1;
 // }
-int dispatcher(){
 
+int dispatcher() {
 	FirstFila2(&readyQueue);
 	TCB_t *nextThread = GetAtIteratorFila2(&readyQueue);
-	if(nextThread != NULL){
+
+	if(nextThread != NULL) {
 		DeleteAtIteratorFila2(&readyQueue);
 		TCB_t *oldThread = runningThread;
 		runningThread = nextThread;
 		runningThread->state = PROCST_EXEC;
 		swapcontext(&oldThread->context,&nextThread->context);
 		return 0;
+	} else {
+		return -1;
 	}
-	else return -1;
 }
 
 ////////////////////////////////// Library Functions ///////////////////////////////
-int ccreate (void* (*start)(void*), void *arg, int prio){
-	if(!systemInitialized){
-		initializesystem();
+int ccreate (void* (*start)(void*), void *arg, int prio) {
+	if(!systemInitialized) {
+		initializeSystem();
 	}
+
 	TCB_t *newThread = (TCB_t *) malloc(sizeof(TCB_t));
+  if (newThread == NULL)
+		return -1;
 
-    if (newThread == NULL)
-        return -1;
+  getcontext(&newThread->context);
+  newThread->context.uc_link = finalizationContext;
+  newThread->context.uc_stack.ss_sp = (char *) malloc(SIGSTKSZ);
+  newThread->context.uc_stack.ss_size = SIGSTKSZ;
+  newThread->tid = generateTID();
+  newThread->state = PROCST_CRIACAO;
+  newThread->prio = 0;
 
-    getcontext(&newThread->context);
-    newThread->context.uc_link = finalizationContext;
-    newThread->context.uc_stack.ss_sp = (char *) malloc(SIGSTKSZ);
-    newThread->context.uc_stack.ss_size = SIGSTKSZ;
-    newThread->tid = generateTID();
-    newThread->state = PROCST_CRIACAO;
-    newThread->prio = 0;
-    
-    makecontext(&newThread->context, (void (*)(void)) start, 1, arg);
-    if(AppendFila2(&readyQueue, (void *) newThread) != 0) return -1;
-    newThread->state = PROCST_APTO;
-    return newThread->tid;
+  makecontext(&newThread->context, (void (*)(void)) start, 1, arg);
+  if(AppendFila2(&readyQueue, (void *) newThread) != 0)
+		return -1;
+  newThread->state = PROCST_APTO;
+  return newThread->tid;
 }
-int cyield(void){
-	if(!systemInitialized){
-		initializesystem();
+
+int cyield(void) {
+	if(!systemInitialized) {
+		initializeSystem();
 	}
 	if(AppendFila2(&readyQueue,(void *) runningThread) != 0) return -1;
 	runningThread->state = PROCST_APTO;
-	
+
 	return dispatcher();
 }
 
-int cjoin(int tid){
-	if(!systemInitialized){
-		initializesystem();
+int cjoin(int tid) {
+	if(!systemInitialized) {
+		initializeSystem();
 	}
 
-	if(anyThreadBlockedForThis(tid) == -1){
+	if(anyThreadBlockedForThis(tid) == -1) {
 		BlockedThreadPair *newBlockedThread = (BlockedThreadPair *) malloc(sizeof(BlockedThreadPair));
-		if(newBlockedThread == NULL) return -1;
+		if(newBlockedThread == NULL)
+			return -1;
+
 		newBlockedThread->blockerThreadTid = tid;
 		newBlockedThread->blockedThreadTid = runningThread->tid;
-		if( AppendFila2(&blockedsByAnotherThread, (void *) newBlockedThread) != 0) return -1;
-		
+		if( AppendFila2(&blockedsByAnotherThread, (void *) newBlockedThread) != 0)
+			return -1;
+
 		runningThread->state = PROCST_BLOQ;
-		if( AppendFila2(&blockQueue, (void *) runningThread) != 0) return -1;
+		if( AppendFila2(&blockQueue, (void *) runningThread) != 0)
+			return -1;
 
 		return dispatcher();
-	}
-
-	else{
+	}	else {
 		return -1;
-
 	}
 }
 
-int csuspend(int tid){
-	if(!systemInitialized){
-		initializesystem();
+int csuspend(int tid) {
+	if(!systemInitialized) {
+		initializeSystem();
 	}
-	if(runningThread->tid == tid) return -1;
+
+	if(runningThread->tid == tid)
+		return -1;
 	TCB_t *aux;
 	int suspendThread = false;
-	
+
 	FirstFila2(&blockQueue);
-	while((aux = GetAtIteratorFila2(&blockQueue)) && aux!= NULL && suspendThread == false){
-		if(aux->tid == tid){
+	while((aux = GetAtIteratorFila2(&blockQueue)) && aux != NULL && suspendThread == false) {
+		if(aux->tid == tid) {
 			aux->state = PROCST_APTO_SUS;
-			AppendFila2(&suspendeblockQueue, (void *) aux);
+			AppendFila2(&suspendBlockQueue, (void *) aux);
 			DeleteAtIteratorFila2(&blockQueue);
 			suspendThread = true;
 		}
 		NextFila2(&blockQueue);
 	}
+
 	FirstFila2(&readyQueue);
-	while((aux = GetAtIteratorFila2(&readyQueue)) && aux!= NULL && suspendThread == false){
-		if(aux->tid == tid){
+	while((aux = GetAtIteratorFila2(&readyQueue)) && aux != NULL && suspendThread == false) {
+		if(aux->tid == tid) {
 			aux->state = PROCST_BLOQ_SUS;
 			AppendFila2(&suspendReadyQueue, (void *) aux);
 			DeleteAtIteratorFila2(&readyQueue);
 			suspendThread = true;
 		}
 		NextFila2(&readyQueue);
-	}	
+	}
 	return 0;
 }
 
-int cresume(int tid){
-	if(!systemInitialized){
-		initializesystem();
+int cresume(int tid) {
+	if(!systemInitialized) {
+		initializeSystem();
 	}
+
 	TCB_t *aux;
 	int resumeThread = false;
-	
-	FirstFila2(&suspendeblockQueue);
-	while((aux = GetAtIteratorFila2(&suspendeblockQueue)) && aux!= NULL && resumeThread == false){
-		if(aux->tid == tid){
+
+	FirstFila2(&suspendBlockQueue);
+	while((aux = GetAtIteratorFila2(&suspendBlockQueue)) && aux != NULL && resumeThread == false) {
+		if(aux->tid == tid) {
 			aux->state = PROCST_BLOQ;
 			AppendFila2(&blockQueue, (void *) aux);
-			DeleteAtIteratorFila2(&suspendeblockQueue);
+			DeleteAtIteratorFila2(&suspendBlockQueue);
 			resumeThread = true;
 		}
-		NextFila2(&suspendeblockQueue);
+		NextFila2(&suspendBlockQueue);
 	}
+
 	FirstFila2(&suspendReadyQueue);
-	while((aux = GetAtIteratorFila2(&suspendReadyQueue)) && aux!= NULL && resumeThread == false){
-		if(aux->tid == tid){
+	while((aux = GetAtIteratorFila2(&suspendReadyQueue)) && aux != NULL && resumeThread == false) {
+		if(aux->tid == tid) {
 			aux->state = PROCST_EXEC;
 			AppendFila2(&readyQueue, (void *) aux);
 			DeleteAtIteratorFila2(&suspendReadyQueue);
 			resumeThread = true;
 		}
 		NextFila2(&suspendReadyQueue);
-	}	
+	}
 	return 0;
 }
