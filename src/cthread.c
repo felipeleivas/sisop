@@ -384,3 +384,40 @@ int cresume(int tid) {
 	}
 	return 0;
 }
+
+int csem_init(csem_t *sem, int count) {
+	sem->fila = (PFILA2) malloc(sizeof(FILA2));
+	if (sem->fila != NULL) {
+		sem->count = count;
+		CreateFila2(sem->fila);
+		return 0;
+	}
+	else
+		return -1;
+}
+
+int cwait(csem_t *sem) {
+	if (sem != NULL){
+		if(sem->count <= 0){    //if sem->count <= 0, thread needs to be blocked
+            sem->count--;
+            runningThread->state = PROCST_BLOQ;
+            if(AppendFila2(sem->fila, (void *) runningThread) != 0)
+                return -1;
+            dispatcher();
+		}
+        else         //if sem->count > 0, nothing to do (thread enter critical zone).
+            sem->count--;
+	}
+	else            //if sem == NULL, error
+        return -1;
+    return 0;
+}
+
+//int csignal(csem_t *sem) {
+  //  if (sem != NULL){
+    //    if (sem->count >= 0){
+//
+  //      }
+    //}
+//}
+
