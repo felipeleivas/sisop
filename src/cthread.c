@@ -413,11 +413,24 @@ int cwait(csem_t *sem) {
     return 0;
 }
 
-//int csignal(csem_t *sem) {
-  //  if (sem != NULL){
-    //    if (sem->count >= 0){
-//
-  //      }
-    //}
-//}
+int csignal(csem_t *sem){
+	if (sem != NULL){
+	        if (sem->count < 0){
+			FirstFila2(sem->fila);
+			sem->count++;
+			TCB_t *tcb = (TCB_t*)GetAtIteratorFila2(sem->fila);
+			if(tcb != NULL){
+				tcb->state = READY;
+				if(AppendFila2(&ready, (void*) tcb) != 0)
+					return -1;
+				DeleteAtIteratorFila2(sem->fila);
+			}
+	        }
+		else
+			sem->count++;
+	}
+	else
+		return -1;
+	return 0;
+}
 
