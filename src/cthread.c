@@ -34,54 +34,6 @@ int anyThreadBlockedForThis(int blockerThreadTid);
 int changeQueueOfThread(FILA2 originQueue, FILA2 destinyQueue, int threadTid);
 
 
-void* func0(void *arg) {
-	printf("Eu sou a thread ID1 imprimindo %d\n", *((int *)arg));
-	// printf("cyield func0()\n" );
-	printf("vai suspender main\n");
-	// csuspend(2);
-	csuspend(0);
-	return 0;
-}
-
-void* func1(void *arg) {
-	printf("Eu sou a thread ID2 imprimindo %d\n", *((int *)arg));
-	// if(cjoin(1) != 0) printf("ERROR\n");;
-	printf("foo1 passanndo a vez pra foo2\n");
-	cyield();
-	printf("foo1 vai resumir a main\n");
-	cresume(0);
-	return 0;
-}
-
-void* func2(void *arg) {
-	printf("Eu sou a thread ID3 imprimindo %d\n", *((int *)arg));
-	printf("foo2 passando a vez seria pra main, mas deve ir pra foo1\n");
-	cyield();
-	printf("deveria vir pra k dps de resumir a main\n");
-	return 0;
-}
-
-/* int main(int argc, char *argv[]) {
-
-	int	id0, id1,id2;
-	int i;
-
-	id0 = ccreate(func0, (void *)&i, 0);
-	id1 = ccreate(func1, (void *)&i, 0);
-	id2 = ccreate(func2, (void *)&i, 0);
-
-	printf("%d %d %d\n",id0, id1, id2 );
-	printf("Eu sou a main apos a criacao de ID1 e ID2\n");
-
-
-	cjoin(id0);
-
-
-	printf("Eu sou a main voltando para terminar o programa\n");
-	return 0;
-} */
-
-
 int initQueues() {
 	if(CreateFila2(&readyQueue) < 0) {
 		return -1;
@@ -148,11 +100,10 @@ int generateTID() {
 }
 
 void threadFinalizator() {
-	printf("FINALIZADOR DE THREAD DELETANDO %d\n", runningThread->tid );
 	int blockedThreadTid = anyThreadBlockedForThis(runningThread->tid);
 	if(blockedThreadTid != -1) {
 		if(unblockThread(blockedThreadTid) != 0) {
-			printf("ruiiiiiiiiiiiiiiiiiiiiiim\n");
+			
 		}
 	}
 	free(runningThread->context.uc_stack.ss_sp);
@@ -420,8 +371,8 @@ int csignal(csem_t *sem){
 			sem->count++;
 			TCB_t *tcb = (TCB_t*)GetAtIteratorFila2(sem->fila);
 			if(tcb != NULL){
-				tcb->state = READY;
-				if(AppendFila2(&ready, (void*) tcb) != 0)
+				tcb->state = PROCST_APTO;
+				if(AppendFila2(&readyQueue, (void*) tcb) != 0)
 					return -1;
 				DeleteAtIteratorFila2(sem->fila);
 			}

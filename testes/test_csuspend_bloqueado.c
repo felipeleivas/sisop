@@ -21,7 +21,10 @@ void* funcTest1(void *i) {
   printf("5 - func1: Logo, a thread id0 deve ir para o estado bloqueado-suspenso.\n");
   csuspend(tidThread0);
   printf("6 - func1: Vou dar cjoin na thread id0. Logo, vou ir para o estado bloqueado.\n");
-  cjoin(tidThread0);
+  if(cjoin(tidThread0 == 0)){
+    printf("ERRO, não deveria permitir o cjoin()\n");
+    exit(-1);
+  }
   printf("14 - func1: Voltei!\n");
   printf("15 - func1: Vou acabar. Não existem outras threds, logo, deve voltar para a main...");
   return 0;
@@ -57,5 +60,5 @@ int main(int argc, char **argv) {
   cjoin(id0);
 
   printf("Main retornando para terminar o programa\n");
-
+  return 0;
 }
