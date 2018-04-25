@@ -61,7 +61,7 @@ void* func2(void *arg) {
 	return 0;
 }
 
-int main(int argc, char *argv[]) {
+/* int main(int argc, char *argv[]) {
 
 	int	id0, id1,id2;
 	int i;
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 
 	printf("Eu sou a main voltando para terminar o programa\n");
 	return 0;
-}
+} */
 
 
 int initQueues() {
