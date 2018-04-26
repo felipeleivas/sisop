@@ -22,18 +22,19 @@ int main(int argc, char **argv) {
   printf("1 - Criando thread id0 com argumentos...\n");
 	id0 = ccreate(parOuImpar, (void *)&par, 0);
   if(id0 >= 0) {
-    printf("      Thread id0 criada com sucesso como esperado!\n");
+    printf("2 - Thread id0 criada com sucesso como esperado!\n");
   } else {
     printf("      Erro ao criar thread id0, problema na funcao ccreate!\n");
   }
 
-  printf("2 - Criando thread id1 sem argumentos...\n");
+  printf("3 - Criando thread id1 sem argumentos...\n");
 	id1 = ccreate(parOuImpar, NULL, 0);
   if(id1 >= 0) {
-    printf("      Thread id1 criada com sucesso como esperado!\n");
+    printf("4 - Thread id1 criada com sucesso como esperado!\n");
   } else {
     printf("      Erro ao criar thread id1, problema na funcao ccreate!\n");
   }
 
 	printf("Main retornando para terminar o programa\n");
+  return 0;
 }

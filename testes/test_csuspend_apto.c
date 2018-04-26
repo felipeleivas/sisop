@@ -49,5 +49,6 @@ int main(int argc, char **argv) {
   cjoin(id0);
 
   printf("Main retornando para terminar o programa\n");
+  return 0;
 
 }

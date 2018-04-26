@@ -384,8 +384,9 @@ int csignal(csem_t *sem){
 		return -1;
 	return 0;
 }
-int cidentify (char *name, int size){
-char names[] = "Felipe Leivas Machado - 262528, Botem o nome de voces aqui\n\0";
+
+int cidentify(char *name, int size) {
+	char names[] = "Felipe Leivas Machado - 262528, Botem o nome de voces aqui\n\0";
 	if(size < 0){
 		return -1;
 	}
@@ -397,7 +398,7 @@ char names[] = "Felipe Leivas Machado - 262528, Botem o nome de voces aqui\n\0";
 		}
 		else{
 			name[i] = names[i];
-		}	
+		}
 	}
 	name[i] = '\0';
 	return 0;

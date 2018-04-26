@@ -24,24 +24,25 @@ int main(int argc, char **argv) {
   printf("Threads Par ou Impar criadas...\n");
   printf("1 - Realizando cjoin da thread id0...\n");
 	if(cjoin(id0) == 0) {
-    printf("    cjoin executado corretamente!\n");
+    printf("2 - cjoin executado corretamente!\n");
   } else {
     printf("    Erro na funcao cjoin!\n");
   }
 
-  printf("2 - Realizando cjoin para a mesma thread, logo, deve resultar em erro...\n");
+  printf("3 - Realizando cjoin para a mesma thread, logo, deve resultar em erro...\n");
 	if(cjoin(id0) != 0) {
-    printf("    cjoin retornou erro como esperado!\n");
+    printf("4 - cjoin retornou erro como esperado!\n");
   } else {
     printf("    Erro na funcao cjoin!\n");
   }
 
-  printf("3 - Realizando cjoin para uma thread inexistente, logo, deve resultar em erro...\n");
+  printf("5 - Realizando cjoin para uma thread inexistente, logo, deve resultar em erro...\n");
   if(cjoin(id1) != 0) {
-    printf("    cjoin retornou erro como esperado!\n");
+    printf("6 - cjoin retornou erro como esperado!\n");
   } else {
     printf("    Erro na funcao cjoin!\n");
   }
 
 	printf("Main retornando para terminar o programa\n");
+  return 0;
 }
