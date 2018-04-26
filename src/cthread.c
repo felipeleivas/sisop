@@ -103,7 +103,7 @@ void threadFinalizator() {
 	int blockedThreadTid = anyThreadBlockedForThis(runningThread->tid);
 	if(blockedThreadTid != -1) {
 		if(unblockThread(blockedThreadTid) != 0) {
-			
+
 		}
 	}
 	free(runningThread->context.uc_stack.ss_sp);
@@ -384,4 +384,21 @@ int csignal(csem_t *sem){
 		return -1;
 	return 0;
 }
-
+int cidentify (char *name, int size){
+char names[] = "Felipe Leivas Machado - 262528, Botem o nome de voces aqui\n\0";
+	if(size < 0){
+		return -1;
+	}
+	int i = 0;
+	for(i = 0; i < size -1; i++){
+		if(names[i] == '\0'){
+			name[i] = '\0';
+			return 0;
+		}
+		else{
+			name[i] = names[i];
+		}	
+	}
+	name[i] = '\0';
+	return 0;
+}
