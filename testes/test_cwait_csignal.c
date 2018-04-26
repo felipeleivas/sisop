@@ -72,7 +72,8 @@ void* funcTest4(void *i) {
 
 int main(int argc, char **argv) {
   int recursos_1 = 1, recursos_2 = 2;
-  int id0 = 0, id1 = 0, id2 = 0, id3 = 0, id4 = 0;
+  int id0 = 0, id1 = 0, id2 = 0, id3 = 0;
+  int id4 = 0;
   id4++;
 
   printf("1 - Inicializando semaforo 1...\n");

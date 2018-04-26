@@ -93,3 +93,113 @@ test_cwait_csignal:
 	mkdir $(BUILD_DIR)
 	$(CC) -c $(SRC_DIR)/cthread.c
 	$(CC) -o $(BUILD_DIR)/test_cwait_csignal $(BIN_DIR)/support.o cthread.o test_cwait_csignal.c -Wall
+
+test_cidentify_2:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_cidentify_2 $(BIN_DIR)/support.o  cthread.o test_cidentify_2.c -Wall
+
+test_ccreate_2:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test-ccreate_2 $(BIN_DIR)/support.o cthread.o test_ccreate_2.c -Wall
+
+test_cjoin_2:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_cjoin_2 $(BIN_DIR)/support.o cthread.o test_cjoin_2.c -Wall
+
+test_cjoin_critical:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_cjoin_critical $(BIN_DIR)/support.o cthread.o test_cjoin_critical.c -Wall
+
+test_cjoin_critical2:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_cjoin_critical2 $(BIN_DIR)/support.o cthread.o test_cjoin_critical2.c -Wall
+
+test_cyield_2:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_cyield_2 $(BIN_DIR)/support.o cthread.o test_cyield_2.c -Wall
+
+test_csuspend_2:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_csuspend_2 $(BIN_DIR)/support.o cthread.o test_csuspend_2.c -Wall
+
+test_cresume_2:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_cresume_2 $(BIN_DIR)/support.o cthread.o test_cresume_2.c -Wall
+
+test_global_suspension:
+		rm -rf build
+		mkdir $(BUILD_DIR)
+		$(CC) -c $(SRC_DIR)/cthread.c
+		$(CC) -o $(BUILD_DIR)/test_global_suspension $(BIN_DIR)/support.o cthread.o test_global_suspension.c -Wall
+
+test_mandel:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_mandel $(BIN_DIR)/support.o cthread.o test_mandel.c -Wall
+
+test_cyield_ERROR:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_cyield_ERROR $(BIN_DIR)/support.o cthread.o test_cyield_ERROR.c -Wall
+
+test_csuspend_ERROR:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_csuspend_ERROR $(BIN_DIR)/support.o cthread.o test_csuspend_ERROR.c -Wall
+
+test_cresume_ERROR:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_cresume_ERROR $(BIN_DIR)/support.o cthread.o test_cresume_ERROR.c -Wall
+
+test_cjoin_ERROR:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_cjoin_ERROR $(BIN_DIR)/support.o cthread.o test_cjoin_ERROR.c -Wall
+
+test_semaforo:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_semaforo $(BIN_DIR)/support.o cthread.o test_semaforo.c -Wall
+
+test_wait_suspens:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_wait_suspens $(BIN_DIR)/support.o cthread.o test_wait_suspens.c -Wall
+
+test_wait_suspens_lib:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -o $(BUILD_DIR)/test_wait_suspens test_wait_suspens.c -L../lib -lcthread -Wall
+
+test_min_threads:
+	rm -rf build
+	mkdir $(BUILD_DIR)
+	$(CC) -c $(SRC_DIR)/cthread.c
+	$(CC) -o $(BUILD_DIR)/test_min_threads $(BIN_DIR)/support.o cthread.o test_min_threads.c -Wall
+	
+clean:
+	rm -rf *.o *~ build
