@@ -350,17 +350,17 @@ int csem_init(csem_t *sem, int count) {
 int cwait(csem_t *sem) {
 	if (sem != NULL){
 		if(sem->count <= 0){    //if sem->count <= 0, thread needs to be blocked
-            sem->count--;
-            runningThread->state = PROCST_BLOQ;
-            if(AppendFila2(sem->fila, (void *) runningThread) != 0)
-                return -1;
-            dispatcher();
+            		sem->count--;
+            		runningThread->state = PROCST_BLOQ;
+            		if(AppendFila2(sem->fila, (void *) runningThread) != 0)
+                		return -1;
+            		dispatcher();
 		}
         else         //if sem->count > 0, nothing to do (thread enter critical zone).
             sem->count--;
 	}
 	else            //if sem == NULL, error
-        return -1;
+        	return -1;
     return 0;
 }
 
@@ -386,7 +386,7 @@ int csignal(csem_t *sem){
 }
 
 int cidentify(char *name, int size) {
-	char names[] = "Felipe Leivas Machado - 262528, Botem o nome de voces aqui\n\0";
+	char names[] = "Felipe Leivas Machado - 262528, Pedro Enrique Sobrosa Lopes - 268611 Botem o nome de voces aqui\n\0";
 	if(size < 0){
 		return -1;
 	}
