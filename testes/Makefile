@@ -148,12 +148,6 @@ test_global_suspension:
 		$(CC) -c $(SRC_DIR)/cthread.c
 		$(CC) -o $(BUILD_DIR)/test_global_suspension $(BIN_DIR)/support.o cthread.o test_global_suspension.c -Wall
 
-test_mandel:
-	rm -rf build
-	mkdir $(BUILD_DIR)
-	$(CC) -c $(SRC_DIR)/cthread.c
-	$(CC) -o $(BUILD_DIR)/test_mandel $(BIN_DIR)/support.o cthread.o test_mandel.c -Wall
-
 test_cyield_ERROR:
 	rm -rf build
 	mkdir $(BUILD_DIR)
@@ -200,6 +194,6 @@ test_min_threads:
 	mkdir $(BUILD_DIR)
 	$(CC) -c $(SRC_DIR)/cthread.c
 	$(CC) -o $(BUILD_DIR)/test_min_threads $(BIN_DIR)/support.o cthread.o test_min_threads.c -Wall
-	
+
 clean:
 	rm -rf *.o *~ build

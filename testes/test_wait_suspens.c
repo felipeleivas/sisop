@@ -24,12 +24,12 @@ void* func0(void *arg) {
   cyield();
 
 
-  printf("[7] func0 unloking SC\n");
+  printf("[8] func0 unloking SC\n");
   csignal(&sem);
   cyield();
 
 
-  printf("[9] func0 resuming func1\n");
+  printf("[10] func0 resuming func1\n");
   cresume(id2);
   cyield();
 
@@ -43,7 +43,7 @@ void* func1(void *arg) {
   cwait(&sem);
 
 
-  printf("[10] func1 running with unlocked SC\n");
+  printf("[11] func1 running with unlocked SC\n");
 
 
 	return 0;
@@ -54,11 +54,11 @@ void* func2(void *arg) {
   cyield();
 
 
-  printf("[6] func2 after func0 suspend blocked func1 while still locking SC\n");
+  printf("[7] func2 after func0 suspend blocked func1 while still locking SC\n");
   cyield();
 
 
-  printf("[8] func2 after SC unlocked but func1 now has to be on suspended apt\n");
+  printf("[9] func2 after SC unlocked but func1 now has to be on suspended apt\n");
 	return 0;
 }
 
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
   id2 = ccreate(func1, NULL, 0);
   ccreate(func2,NULL, 0);
 
-  printf("Main cjoin func1\n");
+  printf("Main cjoin func0\n");
   cjoin(id1);
   printf("COMPLETED TEST\n");
 
