@@ -301,6 +301,9 @@ int csuspend(int tid) {
 		}
 		NextFila2(&readyQueue);
 	}
+	if(suspendThread == false){
+		return -1;
+	}
 	return 0;
 }
 
