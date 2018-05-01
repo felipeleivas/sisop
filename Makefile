@@ -19,6 +19,6 @@ lib: cthread.o
 	ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/support.o $(BIN_DIR)/cthread.o 
 
 clean:
-	find $(BIN_DIR) $(LIB_DIR) $(TEST_DIR) -type f ! -name 'support.o' ! -name '*.c' ! -name 'Makefile' -exec rm -f {} +
-	find $(BIN_DIR) $(LIB_DIR) $(TEST_DIR) -type d ! -name 'support.o' ! -name '*.c' ! -name 'Makefile' -exec rm  -r -f {} +
+	find $(BIN_DIR) $(LIB_DIR) $(TEST_DIR) -type f ! -name 'support.o' ! -name '*.c' ! -name 'Makefile' ! -name 'script.sh'  -exec rm -f {} +
+	find $(TEST_DIR)/* -type d -exec rm  -r -f {} +
 
