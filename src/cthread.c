@@ -329,7 +329,7 @@ int cresume(int tid) {
 	FirstFila2(&suspendReadyQueue);
 	while((aux = GetAtIteratorFila2(&suspendReadyQueue)) && aux != NULL && resumeThread == false) {
 		if(aux->tid == tid) {
-			aux->state = PROCST_EXEC;
+			aux->state = PROCST_APTO;
 			AppendFila2(&readyQueue, (void *) aux);
 			DeleteAtIteratorFila2(&suspendReadyQueue);
 			resumeThread = true;
@@ -371,15 +371,23 @@ int csignal(csem_t *sem){
 	if (sem != NULL){
 	        if (sem->count < 0){
 			FirstFila2(sem->fila);
+			
 			sem->count++;
 			TCB_t *tcb = (TCB_t*)GetAtIteratorFila2(sem->fila);
 			if(tcb != NULL){
-				tcb->state = PROCST_APTO;
-				if(AppendFila2(&readyQueue, (void*) tcb) != 0)
-					return -1;
+				if(tcb ->state = PROCST_BLOQ){
+					tcb->state = PROCST_APTO;
+					if(AppendFila2(&readyQueue, (void*) tcb) != 0)
+						return -1;
+				}
+				if(tcb ->state = PROCST_BLOQ_SUS){
+					tcb->state = PROCST_APTO_SUS;
+					if(AppendFila2(&suspendReadyQueue, (void*) tcb) != 0)
+						return -1;
+				}
 				DeleteAtIteratorFila2(sem->fila);
 			}
-	        }
+        }
 		else
 			sem->count++;
 	}
@@ -389,7 +397,7 @@ int csignal(csem_t *sem){
 }
 
 int cidentify(char *name, int size) {
-	char names[] = "Felipe Leivas Machado - 262528, Pedro Enrique Sobrosa Lopes - 268611, Vinicius Braun Scheffel - 264311\n\0";
+	char names[] = "Felipe Leivas Machado - 262528, Pedro Enrique Sobrosa Lopes - 268611, Vinicius Braun Scheffel - 264311\n";
 	if(size < 0){
 		return -1;
 	}

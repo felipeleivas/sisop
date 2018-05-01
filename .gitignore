@@ -9,3 +9,4 @@
 !/src/*.c
 !Makefile
 !.gitignore
+*.o
