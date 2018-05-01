@@ -1,43 +1,24 @@
-#
-# Makefile de EXEMPLO
-#
-# OBRIGATÓRIO ter uma regra "all" para geração da biblioteca e de uma
-# regra "clean" para remover todos os objetos gerados.
-#
-# É NECESSARIO ADAPTAR ESSE ARQUIVO de makefile para suas necessidades.
-#  1. Cuidado com a regra "clean" para não apagar o "support.o"
-#
-# OBSERVAR que as variáveis de ambiente consideram que o Makefile está no diretótio "cthread"
-#
+CC=gcc
+LIB_DIR=./lib
+INC_DIR=./include
+BIN_DIR=./bin
+SRC_DIR=./src
+TEST_DIR=./testes
+CFLAGS = -Wall
 
-all: object lib
+all: directory clean lib
+directory:
+	mkdir lib -p
 
-object: ./src/cthread.c
-    gcc -c ./src/cthread.c -I ./include/ -Wall
-    mv cthread.o ./bin/
+main: cthread.o
+	$(CC) -o $(BIN_DIR)/main $(BIN_DIR)/*.o -g -Wall
+cthread.o: 
+	$(CC) -c $(SRC_DIR)/cthread.c -o $(BIN_DIR)/cthread.o -Wall 
 
-lib: ./bin/support.o ./bin/cthread.o
-    ar crs ./lib/libcthread.a ./bin/support.o ./bin/cthread.o
+lib: cthread.o
+	ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/support.o $(BIN_DIR)/cthread.o 
 
 clean:
-    rm -rf ./bin/cthread.o ./lib/libcthread.a
+	find $(BIN_DIR) $(LIB_DIR) $(TEST_DIR) -type f ! -name 'support.o' ! -name '*.c' ! -name 'Makefile' -exec rm -f {} +
+	find $(BIN_DIR) $(LIB_DIR) $(TEST_DIR) -type d ! -name 'support.o' ! -name '*.c' ! -name 'Makefile' -exec rm  -r -f {} +
 
- CC=gcc
- LIB_DIR=./lib
- INC_DIR=./include
- BIN_DIR=./bin
- SRC_DIR=./src
-
-# all: regra1 regra2 regran
-
-# regra1: #dependências para a regra1
-# 	$(CC) -o $(BIN_DIR)regra1 $(SRC_DIR)regra1.c -Wall
-
-# regra2: #dependências para a regra2
-# 	$(CC) -o $(BIN_DIR)regra2 $(SRC_DIR)regra2.c -Wall
-
-# regran: #dependências para a regran
-# 	$(CC) -o $(BIN_DIR)regran $(SRC_DIR)regran.c -Wall
-
-# clean:
-# 	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*.o $(SRC_DIR)/*~ $(INC_DIR)/*~ *~

@@ -283,7 +283,7 @@ int csuspend(int tid) {
 	FirstFila2(&blockQueue);
 	while((aux = GetAtIteratorFila2(&blockQueue)) && aux != NULL && suspendThread == false) {
 		if(aux->tid == tid) {
-			aux->state = PROCST_APTO_SUS;
+			aux->state = PROCST_BLOQ_SUS;
 			AppendFila2(&suspendBlockQueue, (void *) aux);
 			DeleteAtIteratorFila2(&blockQueue);
 			suspendThread = true;
@@ -294,7 +294,7 @@ int csuspend(int tid) {
 	FirstFila2(&readyQueue);
 	while((aux = GetAtIteratorFila2(&readyQueue)) && aux != NULL && suspendThread == false) {
 		if(aux->tid == tid) {
-			aux->state = PROCST_BLOQ_SUS;
+			aux->state = PROCST_APTO_SUS;
 			AppendFila2(&suspendReadyQueue, (void *) aux);
 			DeleteAtIteratorFila2(&readyQueue);
 			suspendThread = true;
@@ -408,7 +408,7 @@ int csignal(csem_t *sem){
 					if(AppendFila2(&suspendReadyQueue, (void*) tcb) != 0)
 						return -1;
 				}
-				
+
 				DeleteAtIteratorFila2(sem->fila);
 			}
         }
