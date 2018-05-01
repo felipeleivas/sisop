@@ -336,6 +336,9 @@ int cresume(int tid) {
 		}
 		NextFila2(&suspendReadyQueue);
 	}
+	if(resumeThread == false){
+		return -1;
+	}
 	return 0;
 }
 
@@ -353,11 +356,14 @@ int csem_init(csem_t *sem, int count) {
 int cwait(csem_t *sem) {
 	if (sem != NULL){
 		if(sem->count <= 0){    //if sem->count <= 0, thread needs to be blocked
-            		sem->count--;
-            		runningThread->state = PROCST_BLOQ;
-            		if(AppendFila2(sem->fila, (void *) runningThread) != 0)
-                		return -1;
-            		dispatcher();
+			sem->count--;
+			runningThread->state = PROCST_BLOQ;
+			if(AppendFila2(&blockQueue, (void *) runningThread) != 0)
+	    		return -1;
+
+			if(AppendFila2(sem->fila, (void *) runningThread) != 0)
+	    		return -1;
+			dispatcher();
 		}
         else         //if sem->count > 0, nothing to do (thread enter critical zone).
             sem->count--;
@@ -375,16 +381,34 @@ int csignal(csem_t *sem){
 			sem->count++;
 			TCB_t *tcb = (TCB_t*)GetAtIteratorFila2(sem->fila);
 			if(tcb != NULL){
-				if(tcb ->state = PROCST_BLOQ){
+				if(tcb->state == PROCST_BLOQ){
+					TCB_t *aux;
+					FirstFila2(&blockQueue);
+					while((aux = GetAtIteratorFila2(&blockQueue)) && aux != NULL) {
+						if(aux->tid == tcb->tid) {
+							DeleteAtIteratorFila2(&blockQueue);
+						}
+						NextFila2(&blockQueue);
+					}
 					tcb->state = PROCST_APTO;
 					if(AppendFila2(&readyQueue, (void*) tcb) != 0)
 						return -1;
 				}
-				if(tcb ->state = PROCST_BLOQ_SUS){
+
+				if(tcb->state == PROCST_BLOQ_SUS){
+					TCB_t *aux;
+					FirstFila2(&suspendBlockQueue);
+					while((aux = GetAtIteratorFila2(&suspendBlockQueue)) && aux != NULL) {
+						if(aux->tid == tcb->tid) {
+							DeleteAtIteratorFila2(&suspendBlockQueue);
+						}
+						NextFila2(&suspendBlockQueue);
+					}
 					tcb->state = PROCST_APTO_SUS;
 					if(AppendFila2(&suspendReadyQueue, (void*) tcb) != 0)
 						return -1;
 				}
+				
 				DeleteAtIteratorFila2(sem->fila);
 			}
         }
